@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="windows-1252" ?>
+<!DOCTYPE AppModule SYSTEM "jbo_03_01.dtd">
+<!---->
+<AppModule
+  xmlns="http://xmlns.oracle.com/bc4j"
+  Name="AppModule"
+  Version="11.1.1.62.29"
+  InheritPersonalization="true"
+  ClearCacheOnRollback="true"
+  ComponentClass="mnj.model.service.AppModuleImpl"
+  DefClass="mnj.model.service.AppModuleDefImpl">
+  <DesignTime>
+    <Attr Name="_deployType" Value="0"/>
+    <Attr Name="_isDefCodegen" Value="true"/>
+    <Attr Name="_isCodegen" Value="true"/>
+  </DesignTime>
+  <ViewUsage
+    Name="OrderVO1"
+    ViewObjectName="mnj.model.View.OrderVO"/>
+  <ViewUsage
+    Name="selectORG1"
+    ViewObjectName="mnj.model.View.selectORG"/>
+  <ViewUsage
+    Name="ORGLov1"
+    ViewObjectName="mnj.model.View.ORGLov"/>
+  <ViewUsage
+    Name="searchVO1"
+    ViewObjectName="mnj.model.View.searchVO"/>
+  <ViewUsage
+    Name="SeasonLOV1"
+    ViewObjectName="mnj.model.View.SeasonLOV"/>
+  <ViewUsage
+    Name="BuyerLOV1"
+    ViewObjectName="mnj.model.View.BuyerLOV"/>
+  <ViewUsage
+    Name="OrderRecapVO1"
+    ViewObjectName="mnj.model.View.OrderRecapVO"/>
+  <ViewUsage
+    Name="OrderRecapSummary1"
+    ViewObjectName="mnj.model.View.OrderRecapSummary"/>
+  <ViewUsage
+    Name="order_recap_new_view1"
+    ViewObjectName="mnj.model.View.order_recap_new_view"/>
+</AppModule>

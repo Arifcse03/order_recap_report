@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="windows-1252" ?>
+<!DOCTYPE ViewObject SYSTEM "jbo_03_01.dtd">
+<!---->
+<ViewObject
+  xmlns="http://xmlns.oracle.com/bc4j"
+  Name="order_recap_new_view"
+  Version="11.1.1.62.29"
+  InheritPersonalization="true"
+  BindingStyle="OracleName"
+  CustomQuery="true"
+  PageIterMode="Full"
+  UseGlueCode="false">
+  <DesignTime>
+    <Attr Name="_isExpertMode" Value="true"/>
+  </DesignTime>
+  <Properties>
+    <SchemaBasedProperties>
+      <LABEL
+        ResId="mnj.model.View.order_recap_new_view_LABEL"/>
+    </SchemaBasedProperties>
+  </Properties>
+  <Variable
+    Name="param"
+    Kind="where"
+    Type="oracle.jbo.domain.Number"/>
+  <SQLQuery>
+    <![CDATA[/* updated by wasi uddin*/ 
+SELECT POC_ID,
+       case   
+           when LC_UNIT='340' THEN 'CAL Unit1' 
+           when LC_UNIT='341' THEN 'CGL Unit1'
+           when LC_UNIT='342' THEN 'GFL Unit1'
+        end    
+         LC_UNIT,
+         ar.customer_name,
+         BUYER_ID,
+         SEASON,
+         STYLE,
+         WASH_NAME,
+         COLOR,
+         BPO,
+         QTY,
+         FOB,
+         SHIPDATE,
+         SHIPMODE,
+         COUNTRY,
+         SL_NO,
+         bpo_id
+    FROM (  SELECT POC_ID,
+                   LC_UNIT,
+                   BUYER_ID,
+                   SEASON,
+                   STYLE,
+                   WASH_NAME,
+                   COLOR,
+                   BPO,
+                   SUM (QTY) QTY,
+                   FOB_WITH_SMS_SAMPLE FOB,
+                   TO_CHAR (SHIPDATE, 'MM/DD/YYYY') SHIPDATE,
+                   SHIPMODE,
+                   COUNTRY,
+                   1 SL_NO,
+                   bpo_id
+              FROM XX_ORDER_INFO_V v
+             WHERE BPO_STATUS = 1 AND qty > 0   and 1 = :param     --AND SHIPMODE IS NOT NULL
+          GROUP BY LC_UNIT,
+                   POC_ID,
+                   FOB_ID,
+                   SYSTEM_ID,
+                   BUYER_ID,
+                   SEASON,
+                   STYLE,
+                   WASH_NAME,
+                   COLOR,
+                   BPO_ID,
+                   BPO,
+                   FOB_WITH_SMS_SAMPLE,
+                   SHIPDATE,
+                   SHIPMODE,
+                   COUNTRY,
+                   bpo_id
+          UNION ALL
+            SELECT POC_ID,
+                   LC_UNIT,
+                   BUYER_ID,
+                   SEASON,
+                   STYLE,
+                   WASH_NAME,
+                   COLOR,
+                   '' BPO,
+                   SUM (QTY) QTY,
+                   AVG (FOB_WITH_SMS_SAMPLE),
+                   '' SHIPMODE,
+                   '' abc,                           -- SUM (QTY) * AVG (FOB),
+                   '' COUNTRY,
+                   2 SL_NO,
+                   0 bpo_id
+              FROM XX_ORDER_INFO_V v
+             WHERE BPO_STATUS = 1    and 1 = :param                --AND SHIPMODE IS NOT NULL
+          GROUP BY LC_UNIT,
+                   POC_ID,
+                   FOB_ID,
+                   SYSTEM_ID,
+                   BUYER_ID,
+                   SEASON,
+                   STYLE,
+                   WASH_NAME,
+                   COLOR
+          UNION ALL
+            SELECT 0 POC_ID,
+                   LC_UNIT,
+                   BUYER_ID,
+                   SEASON,
+                   '' STYLE,
+                   '' WASH_NAME,
+                   '' COLOR,
+                   '' BPO,
+                   SUM (QTY) QTY,
+                   AVG (FOB),
+                   '' SHIPDATE,
+                   '' SHIPMODE,
+                   '' COUNTRY,
+                   3 SL_NO,
+                   0 BPO_ID
+              FROM XX_ORDER_INFO_V v
+             WHERE BPO_STATUS = 1 and 1 = :param 
+          GROUP BY LC_UNIT, BUYER_ID, SEASON) M, Ar_customers ar where ar.CUSTOMER_ID=M.buyer_id  
+   
+ORDER BY style,
+         color,
+         wash_name,
+         FOB,
+         SL_NO ASC]]>
+  </SQLQuery>
+  <ViewAttribute
+    Name="PocId"
+    IsPersistent="false"
+    PrecisionRule="true"
+    Type="oracle.jbo.domain.Number"
+    ColumnType="NUMBER"
+    AliasName="POC_ID"
+    Expression="POC_ID"
+    SQLType="NUMERIC">
+    <DesignTime>
+      <Attr Name="_DisplaySize" Value="39"/>
+    </DesignTime>
+  </ViewAttribute>
+  <ViewAttribute
+    Name="LcUnit"
+    IsUpdateable="false"
+    IsPersistent="false"
+    PrecisionRule="true"
+    Precision="9"
+    Type="java.lang.String"
+    ColumnType="CHAR"
+    AliasName="LC_UNIT"
+    Expression="LC_UNIT"
+    SQLType="CHAR">
+    <DesignTime>
+      <Attr Name="_DisplaySize" Value="9"/>
+    </DesignTime>
+  </ViewAttribute>
+  <ViewAttribute
+    Name="CustomerName"
+    IsUpdateable="false"
+    IsPersistent="false"
+    PrecisionRule="true"
+    Precision="50"
+    Type="java.lang.String"
+    ColumnType="VARCHAR2"
+    AliasName="CUSTOMER_NAME"
+    Expression="CUSTOMER_NAME"
+    SQLType="VARCHAR">
+    <DesignTime>
+      <Attr Name="_DisplaySize" Value="50"/>
+    </DesignTime>
+  </ViewAttribute>
+  <ViewAttribute
+    Name="BuyerId"
+    IsUpdateable="false"
+    IsPersistent="false"
+    PrecisionRule="true"
+    Type="oracle.jbo.domain.Number"
+    ColumnType="NUMBER"
+    AliasName="BUYER_ID"
+    Expression="BUYER_ID"
+    SQLType="NUMERIC">
+    <DesignTime>
+      <Attr Name="_DisplaySize" Value="39"/>
+    </DesignTime>
+  </ViewAttribute>
+  <ViewAttribute
+    Name="Season"
+    IsUpdateable="false"
+    IsPersistent="false"
+    PrecisionRule="true"
+    Precision="30"
+    Type="java.lang.String"
+    ColumnType="VARCHAR2"
+    AliasName="SEASON"
+    Expression="SEASON"
+    SQLType="VARCHAR">
+    <DesignTime>
+      <Attr Name="_DisplaySize" Value="30"/>
+    </DesignTime>
+  </ViewAttribute>
+  <ViewAttribute
+    Name="Style"
+    IsUpdateable="false"
+    IsPersistent="false"
+    PrecisionRule="true"
+    Precision="100"
+    Type="java.lang.String"
+    ColumnType="VARCHAR2"
+    AliasName="STYLE"
+    Expression="STYLE"
+    SQLType="VARCHAR">
+    <DesignTime>
+      <Attr Name="_DisplaySize" Value="100"/>
+    </DesignTime>
+  </ViewAttribute>
+  <ViewAttribute
+    Name="WashName"
+    IsUpdateable="false"
+    IsPersistent="false"
+    PrecisionRule="true"
+    Precision="100"
+    Type="java.lang.String"
+    ColumnType="VARCHAR2"
+    AliasName="WASH_NAME"
+    Expression="WASH_NAME"
+    SQLType="VARCHAR">
+    <DesignTime>
+      <Attr Name="_DisplaySize" Value="100"/>
+    </DesignTime>
+  </ViewAttribute>
+  <ViewAttribute
+    Name="Color"
+    IsUpdateable="false"
+    IsPersistent="false"
+    PrecisionRule="true"
+    Precision="30"
+    Type="java.lang.String"
+    ColumnType="VARCHAR2"
+    AliasName="COLOR"
+    Expression="COLOR"
+    SQLType="VARCHAR">
+    <DesignTime>
+      <Attr Name="_DisplaySize" Value="30"/>
+    </DesignTime>
+  </ViewAttribute>
+  <ViewAttribute
+    Name="Bpo"
+    IsUpdateable="false"
+    IsPersistent="false"
+    PrecisionRule="true"
+    Precision="100"
+    Type="java.lang.String"
+    ColumnType="VARCHAR2"
+    AliasName="BPO"
+    Expression="BPO"
+    SQLType="VARCHAR">
+    <DesignTime>
+      <Attr Name="_DisplaySize" Value="100"/>
+    </DesignTime>
+  </ViewAttribute>
+  <ViewAttribute
+    Name="Qty"
+    IsUpdateable="false"
+    IsPersistent="false"
+    PrecisionRule="true"
+    Type="oracle.jbo.domain.Number"
+    ColumnType="NUMBER"
+    AliasName="QTY"
+    Expression="QTY"
+    SQLType="NUMERIC">
+    <DesignTime>
+      <Attr Name="_DisplaySize" Value="39"/>
+    </DesignTime>
+  </ViewAttribute>
+  <ViewAttribute
+    Name="Fob"
+    IsUpdateable="false"
+    IsPersistent="false"
+    PrecisionRule="true"
+    Type="oracle.jbo.domain.Number"
+    ColumnType="NUMBER"
+    AliasName="FOB"
+    Expression="FOB"
+    SQLType="NUMERIC">
+    <DesignTime>
+      <Attr Name="_DisplaySize" Value="39"/>
+    </DesignTime>
+  </ViewAttribute>
+  <ViewAttribute
+    Name="Shipdate"
+    IsUpdateable="false"
+    IsPersistent="false"
+    PrecisionRule="true"
+    Precision="10"
+    Type="java.lang.String"
+    ColumnType="VARCHAR2"
+    AliasName="SHIPDATE"
+    Expression="SHIPDATE"
+    SQLType="VARCHAR">
+    <DesignTime>
+      <Attr Name="_DisplaySize" Value="10"/>
+    </DesignTime>
+  </ViewAttribute>
+  <ViewAttribute
+    Name="Shipmode"
+    IsUpdateable="false"
+    IsPersistent="false"
+    PrecisionRule="true"
+    Precision="20"
+    Type="java.lang.String"
+    ColumnType="VARCHAR2"
+    AliasName="SHIPMODE"
+    Expression="SHIPMODE"
+    SQLType="VARCHAR">
+    <DesignTime>
+      <Attr Name="_DisplaySize" Value="20"/>
+    </DesignTime>
+  </ViewAttribute>
+  <ViewAttribute
+    Name="Country"
+    IsUpdateable="false"
+    IsPersistent="false"
+    PrecisionRule="true"
+    Precision="30"
+    Type="java.lang.String"
+    ColumnType="VARCHAR2"
+    AliasName="COUNTRY"
+    Expression="COUNTRY"
+    SQLType="VARCHAR">
+    <DesignTime>
+      <Attr Name="_DisplaySize" Value="30"/>
+    </DesignTime>
+  </ViewAttribute>
+  <ViewAttribute
+    Name="SlNo"
+    IsUpdateable="false"
+    IsPersistent="false"
+    PrecisionRule="true"
+    Type="oracle.jbo.domain.Number"
+    ColumnType="NUMBER"
+    AliasName="SL_NO"
+    Expression="SL_NO"
+    SQLType="NUMERIC">
+    <DesignTime>
+      <Attr Name="_DisplaySize" Value="39"/>
+    </DesignTime>
+  </ViewAttribute>
+  <ViewAttribute
+    Name="BpoId"
+    IsUpdateable="false"
+    IsPersistent="false"
+    PrecisionRule="true"
+    Type="oracle.jbo.domain.Number"
+    ColumnType="NUMBER"
+    AliasName="BPO_ID"
+    Expression="BPO_ID"
+    SQLType="NUMERIC">
+    <DesignTime>
+      <Attr Name="_DisplaySize" Value="39"/>
+    </DesignTime>
+  </ViewAttribute>
+  <ResourceBundle>
+    <PropertiesBundle
+      PropertiesFile="mnj.model.ModelBundle"/>
+  </ResourceBundle>
+</ViewObject>
