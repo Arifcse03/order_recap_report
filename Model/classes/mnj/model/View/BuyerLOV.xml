@@ -23,10 +23,7 @@
     <![CDATA[select DISTINCT ac.CUSTOMER_ID,
        ac.CUSTOMER_NUMBER,
        ac.CUSTOMER_NAME 
-from ar_customers ac,
-     qa_results_v qr 
-WHERE qr.NAME = 'BUYER WISE DETAILS OM'
-AND ac.CUSTOMER_ID = qr.CHARACTER15 and ac.status = 'A'  and CUSTOMER_NAME_PHONETIC='M']]>
+     from ar_customers ac where AC.CUSTOMER_NAME_PHONETIC in ( 'UM'  ,'EM' ) and STATUS='A']]>
   </SQLQuery>
   <ViewAttribute
     Name="CustomerId"

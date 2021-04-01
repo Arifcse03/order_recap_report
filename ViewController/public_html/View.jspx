@@ -340,7 +340,8 @@
               </af:column>
               <af:column sortProperty="Qty" filterable="true" sortable="true"
                          headerText="#{bindings.order_recap_new_view1.hints.Qty.label}"
-                         id="c23" align="center">
+                         id="c23" align="center"
+                         inlineStyle=" background-color:#{(row.Bpo  eq null   ?'Yellow':'')}">
                 <af:outputText value="#{row.Qty}" id="ot16">
                   <af:convertNumber groupingUsed="false"
                                     pattern="#{bindings.order_recap_new_view1.hints.Qty.format}"/>

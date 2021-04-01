@@ -23,7 +23,7 @@
     <![CDATA[select DISTINCT ac.CUSTOMER_ID,
        ac.CUSTOMER_NUMBER,
        ac.CUSTOMER_NAME 
-from ar_customers ac where AC.CUSTOMER_NAME_PHONETIC in ( 'UM'  ,'EM' ) and STATUS='A']]>
+     from ar_customers ac where AC.CUSTOMER_NAME_PHONETIC in ( 'UM'  ,'EM' ) and STATUS='A']]>
   </SQLQuery>
   <ViewAttribute
     Name="CustomerId"
