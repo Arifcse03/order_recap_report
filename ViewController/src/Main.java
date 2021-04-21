@@ -49,6 +49,8 @@ public class Main {
        //  AdfFacesContext.getCurrentInstance().addPartialTarget(panelBinding);
         ViewObject searchVO=am.getsearchVO1();
         ViewObject OrgVO=am.getselectORG1();
+        ViewObject oder=am.getorder_recap_new_view1();
+        oder.clearCache();
         String season=null;
         int Buyer=0;
         int org=0;
@@ -91,7 +93,7 @@ public class Main {
         oder.setWhereClause("SEASON = '"+season+"' AND BUYER_ID = '"+Buyer+"' AND ORG_ID= '"+org+"'");
        **/
        
-      ViewObject oder=am.getorder_recap_new_view1();
+     
         oder.setNamedWhereClauseParam("param",pram);
         oder.setWhereClause("SEASON = '"+season+"' AND BUYER_ID = '"+Buyer+"' AND LC_UNIT= '"+orgname+"'");
        
@@ -99,7 +101,7 @@ public class Main {
         //oder.setWhereClause("BUYER_ID = '"+Buyer+"'");
         //oder.setWhereClause("ORG_ID= '"+org+"'");
         oder.executeQuery();
-        
+        oder.clearCache();
        
        //AdfFacesContext.getCurrentInstance().addPartialTarget(orderSummaryReport);
       AdfFacesContext.getCurrentInstance().addPartialTarget(order_recap_new); 
