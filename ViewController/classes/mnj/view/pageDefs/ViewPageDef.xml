@@ -80,6 +80,7 @@
           <Item Value="Country"/>
           <Item Value="SlNo"/>
           <Item Value="BpoId"/>
+          <Item Value="Amonut"/>
         </AttrNames>
       </nodeDefinition>
     </tree>

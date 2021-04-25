@@ -333,15 +333,16 @@
                          id="c27" align="center">
                 <af:outputText value="#{row.Color}" id="ot29"/>
               </af:column>
-              <af:column sortProperty="Bpo" filterable="true" sortable="true"
+              <af:column filterable="true" sortable="true"
                          headerText="#{bindings.order_recap_new_view1.hints.Bpo.label}"
-                         id="c19" align="center">
+                         id="c19" align="center"
+                         inlineStyle="background-color:#{(row.Bpo  eq 'SUB TOTAL(COLOR&amp;WASH)' ?'Yellow':'')};">
                 <af:outputText value="#{row.Bpo}" id="ot23"/>
               </af:column>
               <af:column sortProperty="Qty" filterable="true" sortable="true"
                          headerText="#{bindings.order_recap_new_view1.hints.Qty.label}"
                          id="c23" align="center"
-                         inlineStyle=" background-color:#{(row.Bpo  eq null   ?'Yellow':'')}">
+                         inlineStyle="background-color:#{(row.Bpo  eq 'SUB TOTAL(COLOR&amp;WASH)' ?'Yellow':'')}">
                 <af:outputText value="#{row.Qty}" id="ot16">
                   <af:convertNumber groupingUsed="false"
                                     pattern="#{bindings.order_recap_new_view1.hints.Qty.format}"/>
@@ -354,6 +355,10 @@
                   <af:convertNumber groupingUsed="false"
                                     pattern="#{bindings.order_recap_new_view1.hints.Fob.format}"/>
                 </af:outputText>
+              </af:column>
+              <af:column headerText="#{bindings.order_recap_new_view1.hints.Amonut.label}"
+                         id="c30">
+                <af:outputText value="#{row.Amonut}" id="ot30"/>
               </af:column>
               <af:column sortProperty="Shipdate" filterable="true"
                          sortable="true"

@@ -24,28 +24,47 @@
     Kind="where"
     Type="oracle.jbo.domain.Number"/>
   <SQLQuery>
-    <![CDATA[/* updated by wasi uddin*/ 
-SELECT POC_ID,
-       case   
-           when LC_UNIT='340' THEN 'CAL Unit1' 
-           when LC_UNIT='341' THEN 'CGL Unit1'
-           when LC_UNIT='342' THEN 'GFL Unit1'
-        end    
-         LC_UNIT,
+    <![CDATA[/* Formatted on 4/22/2021 10:13:26 AM (QP5 v5.256.13226.35538) */
+/* updated by wasi uddin*/
+
+  SELECT  CASE
+            WHEN POC_ID = 0 THEN 'Grand Total'
+           else 
+            to_char(POC_ID)
+         END POC_ID ,
+         CASE
+            WHEN LC_UNIT = '340' THEN 'CAL Unit1'
+            WHEN LC_UNIT = '341' THEN 'CGL Unit1'
+            WHEN LC_UNIT = '342' THEN 'GFL Unit1'
+         END
+            LC_UNIT,
          ar.customer_name,
          BUYER_ID,
          SEASON,
          STYLE,
          WASH_NAME,
          COLOR,
-         BPO,
+         CASE
+            WHEN BPO IS NULL THEN 'SUB TOTAL(COLOR&WASH)'
+           else 
+            to_char(BPO)
+         END BPO,
          QTY,
-         FOB,
+          CASE
+            WHEN FOB = 0 THEN ''
+           else 
+            to_char('$ '||FOB)
+         END FOB ,
+         '$ '||S_Value AMONUT,
          SHIPDATE,
          SHIPMODE,
          COUNTRY,
          SL_NO,
-         bpo_id
+          CASE
+            WHEN bpo_id = 0 THEN ''
+           else 
+            to_char(bpo_id)
+         END bpo_id
     FROM (  SELECT POC_ID,
                    LC_UNIT,
                    BUYER_ID,
@@ -56,13 +75,14 @@ SELECT POC_ID,
                    BPO,
                    SUM (QTY) QTY,
                    FOB_WITH_SMS_SAMPLE FOB,
+                   SUM (QTY)*FOB_WITH_SMS_SAMPLE S_Value,
                    TO_CHAR (SHIPDATE, 'MM/DD/YYYY') SHIPDATE,
                    SHIPMODE,
                    COUNTRY,
                    1 SL_NO,
                    bpo_id
               FROM XX_ORDER_INFO_V v
-             WHERE BPO_STATUS = 1 AND qty > 0   and 1 = :param     --AND SHIPMODE IS NOT NULL
+             WHERE BPO_STATUS = 1 AND qty > 0 AND 1 = :param --AND SHIPMODE IS NOT NULL
           GROUP BY LC_UNIT,
                    POC_ID,
                    FOB_ID,
@@ -90,13 +110,14 @@ SELECT POC_ID,
                    '' BPO,
                    SUM (QTY) QTY,
                    AVG (FOB_WITH_SMS_SAMPLE),
+                   SUM (QTY)*AVG (FOB_WITH_SMS_SAMPLE) S_Value,
                    '' SHIPMODE,
                    '' abc,                           -- SUM (QTY) * AVG (FOB),
                    '' COUNTRY,
                    2 SL_NO,
                    0 bpo_id
               FROM XX_ORDER_INFO_V v
-             WHERE BPO_STATUS = 1    and 1 = :param                --AND SHIPMODE IS NOT NULL
+             WHERE BPO_STATUS = 1 AND 1 = :param    --AND SHIPMODE IS NOT NULL
           GROUP BY LC_UNIT,
                    POC_ID,
                    FOB_ID,
@@ -116,16 +137,18 @@ SELECT POC_ID,
                    '' COLOR,
                    '' BPO,
                    SUM (QTY) QTY,
-                   AVG (FOB),
+                  0,-- AVG (FOB),
+                   sum(QTY*FOB)  S_Value,
                    '' SHIPDATE,
                    '' SHIPMODE,
                    '' COUNTRY,
                    3 SL_NO,
                    0 BPO_ID
               FROM XX_ORDER_INFO_V v
-             WHERE BPO_STATUS = 1 and 1 = :param 
-          GROUP BY LC_UNIT, BUYER_ID, SEASON) M, Ar_customers ar where ar.CUSTOMER_ID=M.buyer_id  
-   
+             WHERE BPO_STATUS = 1 AND 1 = :param
+          GROUP BY LC_UNIT, BUYER_ID, SEASON) M,
+         Ar_customers ar
+   WHERE ar.CUSTOMER_ID = M.buyer_id --and season='C3-21 Fall' and  LC_UNIT=341
 ORDER BY style,
          color,
          wash_name,
@@ -136,13 +159,14 @@ ORDER BY style,
     Name="PocId"
     IsPersistent="false"
     PrecisionRule="true"
-    Type="oracle.jbo.domain.Number"
-    ColumnType="NUMBER"
+    Precision="40"
+    Type="java.lang.String"
+    ColumnType="VARCHAR2"
     AliasName="POC_ID"
     Expression="POC_ID"
-    SQLType="NUMERIC">
+    SQLType="VARCHAR">
     <DesignTime>
-      <Attr Name="_DisplaySize" Value="39"/>
+      <Attr Name="_DisplaySize" Value="40"/>
     </DesignTime>
   </ViewAttribute>
   <ViewAttribute
@@ -155,7 +179,7 @@ ORDER BY style,
     ColumnType="CHAR"
     AliasName="LC_UNIT"
     Expression="LC_UNIT"
-    SQLType="CHAR">
+    SQLType="VARCHAR">
     <DesignTime>
       <Attr Name="_DisplaySize" Value="9"/>
     </DesignTime>
@@ -280,16 +304,31 @@ ORDER BY style,
   </ViewAttribute>
   <ViewAttribute
     Name="Fob"
+    IsPersistent="false"
+    PrecisionRule="true"
+    Precision="42"
+    Type="java.lang.String"
+    ColumnType="VARCHAR2"
+    AliasName="FOB"
+    Expression="FOB"
+    SQLType="VARCHAR">
+    <DesignTime>
+      <Attr Name="_DisplaySize" Value="42"/>
+    </DesignTime>
+  </ViewAttribute>
+  <ViewAttribute
+    Name="Amonut"
     IsUpdateable="false"
     IsPersistent="false"
     PrecisionRule="true"
-    Type="oracle.jbo.domain.Number"
-    ColumnType="NUMBER"
-    AliasName="FOB"
-    Expression="FOB"
-    SQLType="NUMERIC">
+    Precision="42"
+    Type="java.lang.String"
+    ColumnType="VARCHAR2"
+    AliasName="AMONUT"
+    Expression="AMONUT"
+    SQLType="VARCHAR">
     <DesignTime>
-      <Attr Name="_DisplaySize" Value="39"/>
+      <Attr Name="_DisplaySize" Value="42"/>
     </DesignTime>
   </ViewAttribute>
   <ViewAttribute

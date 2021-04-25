@@ -1,5 +1,8 @@
 import java.sql.CallableStatement;
 
+import javax.faces.application.ViewHandler;
+import javax.faces.component.UIViewRoot;
+import javax.faces.context.FacesContext;
 import javax.faces.event.ValueChangeEvent;
 
 import mnj.model.service.AppModuleImpl;
@@ -51,6 +54,7 @@ public class Main {
         ViewObject OrgVO=am.getselectORG1();
         ViewObject oder=am.getorder_recap_new_view1();
         oder.clearCache();
+        refresh();
         String season=null;
         int Buyer=0;
         int org=0;
@@ -195,4 +199,16 @@ public class Main {
     public RichTable getOrder_recap_new() {
         return order_recap_new;
     }
+    
+    public void refresh() {
+                 FacesContext facesContext = FacesContext.getCurrentInstance();
+                 String refreshpage = facesContext.getViewRoot().getViewId();
+                 ViewHandler  viewHandler =facesContext.getApplication().getViewHandler();
+                 UIViewRoot viewroot =  viewHandler.createView( facesContext, refreshpage);
+                 viewroot.setViewId(refreshpage);
+                 facesContext.setViewRoot(viewroot);
+           }
+    
+    
+    
 }
