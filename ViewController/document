@@ -1,0 +1,264 @@
+old query for view (till 30-5-2021)
+
+-------------------------------------------------
+/* Formatted on 4/22/2021 10:13:26 AM (QP5 v5.256.13226.35538) */
+/* updated by wasi uddin*/
+
+  SELECT  CASE
+            WHEN POC_ID = 0 THEN 'Grand Total'
+           else 
+            to_char(POC_ID)
+         END POC_ID ,
+         CASE
+            WHEN LC_UNIT = '340' THEN 'CAL Unit1'
+            WHEN LC_UNIT = '341' THEN 'CGL Unit1'
+            WHEN LC_UNIT = '342' THEN 'GFL Unit1'
+         END
+            LC_UNIT,
+         ar.customer_name,
+         BUYER_ID,
+         SEASON,
+         STYLE,
+         WASH_NAME,
+         COLOR,
+         CASE
+            WHEN BPO IS NULL THEN 'SUB TOTAL(COLOR&WASH)'
+           else 
+            to_char(BPO)
+         END BPO,
+         QTY,
+          CASE
+            WHEN FOB = 0 THEN ''
+           else 
+            to_char('$ '||FOB)
+         END FOB ,
+         '$ '||S_Value AMONUT,
+         SHIPDATE,
+         SHIPMODE,
+         COUNTRY,
+         SL_NO,
+          CASE
+            WHEN bpo_id = 0 THEN ''
+           else 
+            to_char(bpo_id)
+         END bpo_id
+    FROM (  SELECT POC_ID,
+                   LC_UNIT,
+                   BUYER_ID,
+                   SEASON,
+                   STYLE,
+                   WASH_NAME,
+                   COLOR,
+                   BPO,
+                   SUM (QTY) QTY,
+                   FOB_WITH_SMS_SAMPLE FOB,
+                   SUM (QTY)*FOB_WITH_SMS_SAMPLE S_Value,
+                   TO_CHAR (SHIPDATE, 'MM/DD/YYYY') SHIPDATE,
+                   SHIPMODE,
+                   COUNTRY,
+                   1 SL_NO,
+                   bpo_id
+              FROM XX_ORDER_INFO_V v
+             WHERE BPO_STATUS = 1 AND qty > 0 AND 1 = :param --AND SHIPMODE IS NOT NULL
+          GROUP BY LC_UNIT,
+                   POC_ID,
+                   FOB_ID,
+                   SYSTEM_ID,
+                   BUYER_ID,
+                   SEASON,
+                   STYLE,
+                   WASH_NAME,
+                   COLOR,
+                   BPO_ID,
+                   BPO,
+                   FOB_WITH_SMS_SAMPLE,
+                   SHIPDATE,
+                   SHIPMODE,
+                   COUNTRY,
+                   bpo_id
+          UNION ALL
+            SELECT POC_ID,
+                   LC_UNIT,
+                   BUYER_ID,
+                   SEASON,
+                   STYLE,
+                   WASH_NAME,
+                   COLOR,
+                   '' BPO,
+                   SUM (QTY) QTY,
+                   AVG (FOB_WITH_SMS_SAMPLE),
+                   SUM (QTY)*AVG (FOB_WITH_SMS_SAMPLE) S_Value,
+                   '' SHIPMODE,
+                   '' abc,                           -- SUM (QTY) * AVG (FOB),
+                   '' COUNTRY,
+                   2 SL_NO,
+                   0 bpo_id
+              FROM XX_ORDER_INFO_V v
+             WHERE BPO_STATUS = 1 AND 1 = :param    --AND SHIPMODE IS NOT NULL
+          GROUP BY LC_UNIT,
+                   POC_ID,
+                   FOB_ID,
+                   SYSTEM_ID,
+                   BUYER_ID,
+                   SEASON,
+                   STYLE,
+                   WASH_NAME,
+                   COLOR
+          UNION ALL
+            SELECT 0 POC_ID,
+                   LC_UNIT,
+                   BUYER_ID,
+                   SEASON,
+                   '' STYLE,
+                   '' WASH_NAME,
+                   '' COLOR,
+                   '' BPO,
+                   SUM (QTY) QTY,
+                  0,-- AVG (FOB),
+                   sum(QTY*FOB)  S_Value,
+                   '' SHIPDATE,
+                   '' SHIPMODE,
+                   '' COUNTRY,
+                   3 SL_NO,
+                   0 BPO_ID
+              FROM XX_ORDER_INFO_V v
+             WHERE BPO_STATUS = 1 AND 1 = :param
+          GROUP BY LC_UNIT, BUYER_ID, SEASON) M,
+         Ar_customers ar
+   WHERE ar.CUSTOMER_ID = M.buyer_id --and season='C3-21 Fall' and  LC_UNIT=341
+ORDER BY style,
+         color,
+         wash_name,
+         FOB,
+         SL_NO ASC
+         ----------------------------------------------------------
+         
+         
+         Updated Query to add SIZEWISE Qty 30-5-2021
+         
+         
+/* updated by wasi uddin 30-05-2021*/
+
+SELECT CASE WHEN POC_ID = 0 THEN 'Grand Total' ELSE TO_CHAR (POC_ID) END
+POC_ID,
+CASE
+WHEN LC_UNIT = '340' THEN 'CAL Unit1'
+WHEN LC_UNIT = '341' THEN 'CGL Unit1'
+WHEN LC_UNIT = '342' THEN 'GFL Unit1'
+END
+LC_UNIT,
+ar.customer_name,
+BUYER_ID,
+SEASON,
+STYLE,
+WASH_NAME,
+COLOR,
+CASE
+WHEN BPO IS NULL THEN 'SUB TOTAL(COLOR&WASH)'
+ELSE TO_CHAR (BPO)
+END
+BPO,
+SQTY,
+QTY,
+CASE WHEN FOB = 0 THEN '' ELSE TO_CHAR ('$ ' || FOB) END FOB,
+'$ ' || S_Value AMONUT,
+SHIPDATE,
+SHIPMODE,
+COUNTRY,
+SL_NO,
+CASE WHEN bpo_id = 0 THEN '' ELSE TO_CHAR (bpo_id) END bpo_id
+FROM ( SELECT POC_ID,
+LC_UNIT,
+BUYER_ID,
+SEASON,
+STYLE,
+WASH_NAME,
+COLOR,
+BPO,
+to_char((select sum(QTY) from XX_OM_SIZEWISE_L_T T where T.bpo_id=V.bpo_id)) Sqty,
+SUM (QTY) QTY,
+FOB_WITH_SMS_SAMPLE FOB,
+SUM (QTY) * FOB_WITH_SMS_SAMPLE S_Value,
+TO_CHAR (SHIPDATE, 'MM/DD/YYYY') SHIPDATE,
+SHIPMODE,
+COUNTRY,
+1 SL_NO,
+bpo_id
+FROM XX_ORDER_INFO_V v
+WHERE BPO_STATUS = 1 AND qty > 0 AND 1 = :param --AND SHIPMODE IS NOT NULL
+GROUP BY LC_UNIT,
+POC_ID,
+FOB_ID,
+SYSTEM_ID,
+BUYER_ID,
+SEASON,
+STYLE,
+WASH_NAME,
+COLOR,
+BPO_ID,
+BPO,
+FOB_WITH_SMS_SAMPLE,
+SHIPDATE,
+SHIPMODE,
+COUNTRY,
+bpo_id
+UNION ALL
+SELECT POC_ID,
+LC_UNIT,
+BUYER_ID,
+SEASON,
+STYLE,
+WASH_NAME,
+COLOR,
+'' BPO,
+'',
+SUM (QTY) QTY,
+AVG (FOB_WITH_SMS_SAMPLE),
+SUM (QTY) * AVG (FOB_WITH_SMS_SAMPLE) S_Value,
+'' SHIPMODE,
+'' abc, -- SUM (QTY) * AVG (FOB),
+'' COUNTRY,
+2 SL_NO,
+0 bpo_id
+FROM XX_ORDER_INFO_V v
+WHERE BPO_STATUS = 1 AND 1 = :param --AND SHIPMODE IS NOT NULL
+GROUP BY LC_UNIT,
+POC_ID,
+FOB_ID,
+SYSTEM_ID,
+BUYER_ID,
+SEASON,
+STYLE,
+WASH_NAME,
+COLOR
+UNION ALL
+SELECT 0 POC_ID,
+LC_UNIT,
+BUYER_ID,
+SEASON,
+'' STYLE,
+'' WASH_NAME,
+'' COLOR,
+'' BPO,
+'' qty1,
+SUM (QTY) QTY,
+0, -- AVG (FOB),
+SUM (QTY * FOB) S_Value,
+'' SHIPDATE,
+'' SHIPMODE,
+'' COUNTRY,
+3 SL_NO,
+0 BPO_ID
+FROM XX_ORDER_INFO_V v
+WHERE BPO_STATUS = 1 AND 1 = :param
+GROUP BY LC_UNIT, BUYER_ID, SEASON) M,
+Ar_customers ar
+WHERE ar.CUSTOMER_ID = M.buyer_id --and season='C3-21 Fall' and LC_UNIT=341
+ORDER BY style,
+color,
+wash_name,
+FOB,
+SL_NO ASC
+
+         
+         ---------------------------------------------

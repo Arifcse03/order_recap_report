@@ -81,6 +81,7 @@
           <Item Value="SlNo"/>
           <Item Value="BpoId"/>
           <Item Value="Amonut"/>
+          <Item Value="Sqty"/>
         </AttrNames>
       </nodeDefinition>
     </tree>

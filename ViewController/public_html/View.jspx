@@ -342,11 +342,15 @@
               <af:column sortProperty="Qty" filterable="true" sortable="true"
                          headerText="#{bindings.order_recap_new_view1.hints.Qty.label}"
                          id="c23" align="center"
-                         inlineStyle="background-color:#{(row.Bpo  eq 'SUB TOTAL(COLOR&amp;WASH)' ?'Yellow':'')}">
+                         inlineStyle="background-color:#{(row.Bpo  eq 'SUB TOTAL(COLOR&amp;WASH)' ?'Yellow':'' || row.Qty != row.Sqty ?'Red':'Green' )}; color:Black;">
                 <af:outputText value="#{row.Qty}" id="ot16">
                   <af:convertNumber groupingUsed="false"
                                     pattern="#{bindings.order_recap_new_view1.hints.Qty.format}"/>
                 </af:outputText>
+              </af:column>
+              <af:column headerText="#{bindings.order_recap_new_view1.hints.Sqty.label}"
+                         id="c31" visible="false">
+                <af:outputText value="#{row.Sqty}" id="ot31"/>
               </af:column>
               <af:column sortProperty="Fob" filterable="true" sortable="true"
                          headerText="#{bindings.order_recap_new_view1.hints.Fob.label}"
